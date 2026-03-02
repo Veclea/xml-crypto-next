@@ -243,32 +243,28 @@ export class RsaSha512Mgf1 implements SignatureAlgorithm {
     };
 }
 export class Ed25519 implements SignatureAlgorithm {
-    getSignature = createOptionalCallbackFunction<string, [crypto.BinaryLike, crypto.KeyLike]>(
+    getSignature = createOptionalCallbackFunction(
         (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
-            // 确保 signedInfo 转换为 Buffer
-            const bufferData = crypto.BinaryLikeToBuffer(signedInfo);
-
             if (!(typeof privateKey === "string" || Buffer.isBuffer(privateKey))) {
                 throw new Error("keys must be strings or buffers");
             }
-
-            const signature = crypto.sign('ed25519', bufferData, privateKey);
+            // 使用 crypto.sign() 一次性签名 (Ed25519 不支持流式处理)
+            const signature = crypto.sign(null, <Uint8Array<ArrayBuffer> | Uint8ClampedArray<ArrayBuffer> | Uint16Array<ArrayBuffer> | Uint32Array<ArrayBuffer> | Int8Array<ArrayBuffer> | Int16Array<ArrayBuffer> | Int32Array<ArrayBuffer> | BigUint64Array<ArrayBuffer> | BigInt64Array<ArrayBuffer> | Float32Array<ArrayBuffer> | Float64Array<ArrayBuffer> | DataView<ArrayBufferLike>>signedInfo, privateKey);
             return signature.toString('base64');
-        }
+        },
     );
 
-    verifySignature = createOptionalCallbackFunction<boolean, [string, crypto.KeyLike, string]>(
+    verifySignature = createOptionalCallbackFunction(
         (material: string, key: crypto.KeyLike, signatureValue: string): boolean => {
-            // 将 material 转换为 Buffer
-            const bufferMaterial = crypto.BinaryLikeToBuffer(material);
-
             if (!(typeof key === "string" || Buffer.isBuffer(key))) {
                 throw new Error("keys must be strings or buffers");
             }
-
+            // 将 Base64 签名转换为 Buffer
             const signature = Buffer.from(signatureValue, 'base64');
-            return crypto.verify('ed25519', bufferMaterial, key, signature);
-        }
+            // 使用 crypto.verify() 验证签名
+            // @ts-ignore
+            return crypto.verify(null, material, key, signature);
+        },
     );
 
     getAlgorithmName = () => {
