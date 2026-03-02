@@ -52,7 +52,6 @@ export class RsaSha256 implements SignatureAlgorithm {
     return "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
   };
 }
-
 export class RsaSha256Mgf1 implements SignatureAlgorithm {
   getSignature = createOptionalCallbackFunction(
     (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
@@ -99,6 +98,7 @@ export class RsaSha256Mgf1 implements SignatureAlgorithm {
     return "http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1";
   };
 }
+
 export class RsaSha384 implements SignatureAlgorithm {
     getSignature = createOptionalCallbackFunction(
         (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
@@ -124,7 +124,6 @@ export class RsaSha384 implements SignatureAlgorithm {
         return "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
     };
 }
-
 export class RsaSha384Mgf1 implements SignatureAlgorithm {
     getSignature = createOptionalCallbackFunction(
         (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
@@ -171,6 +170,7 @@ export class RsaSha384Mgf1 implements SignatureAlgorithm {
         return "http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1";
     };
 }
+
 export class RsaSha512 implements SignatureAlgorithm {
   getSignature = createOptionalCallbackFunction(
     (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
@@ -242,6 +242,7 @@ export class RsaSha512Mgf1 implements SignatureAlgorithm {
         return "http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1";
     };
 }
+
 export class Ed25519 implements SignatureAlgorithm {
     getSignature = createOptionalCallbackFunction(
         (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
