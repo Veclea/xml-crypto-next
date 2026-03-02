@@ -1,6 +1,6 @@
 {
-  "name": "xml-crypto",
-  "version": "6.0.0",
+  "name": "xml-crypto-next",
+  "version": "7.0.0",
   "private": false,
   "description": "Xml digital signature and encryption library for Node.js",
   "keywords": [
@@ -26,7 +26,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc",
     "changelog": "gren changelog --override --generate",
     "lint": "eslint \"{src,test}/*.ts\" --cache && npm run prettier-check",
     "lint:fix": "eslint --fix \"{src,test}/*.ts\" && npm run prettier-format",
