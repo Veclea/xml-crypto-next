@@ -34,8 +34,8 @@ export type SignatureAlgorithmType =
     | "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"
     | "http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1"
     | "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
-    | "€‹http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1"
-
+    | "http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1"
+    | "http://www.w3.org/2007/05/xmldsig-more#eddsa-ed25519"
     | "http://www.w3.org/2000/09/xmldsig#hmac-sha1"
     | string;
 
