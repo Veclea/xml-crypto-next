@@ -1,6 +1,6 @@
 {
   "name": "xml-crypto-next",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "private": false,
   "description": "Xml digital signature and encryption library for Node.js",
   "keywords": [
