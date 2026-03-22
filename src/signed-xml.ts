@@ -90,11 +90,9 @@ export class SignedXml {
     new () => CanonicalizationOrTransformationAlgorithm
   > = {
     "http://www.w3.org/TR/2001/REC-xml-c14n-20010315": c14n.C14nCanonicalization,
-    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments":
-      c14n.C14nCanonicalizationWithComments,
+    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments": c14n.C14nCanonicalizationWithComments,
     "http://www.w3.org/2001/10/xml-exc-c14n#": execC14n.ExclusiveCanonicalization,
-    "http://www.w3.org/2001/10/xml-exc-c14n#WithComments":
-      execC14n.ExclusiveCanonicalizationWithComments,
+    "http://www.w3.org/2001/10/xml-exc-c14n#WithComments": execC14n.ExclusiveCanonicalizationWithComments,
     "http://www.w3.org/2000/09/xmldsig#enveloped-signature": envelopedSignatures.EnvelopedSignature,
   };
 
