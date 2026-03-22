@@ -1,6 +1,5 @@
 import * as crypto from "crypto";
 import { type SignatureAlgorithm, createOptionalCallbackFunction } from "./types";
-
 export class RsaSha1 implements SignatureAlgorithm {
   getSignature = createOptionalCallbackFunction(
     (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
@@ -244,39 +243,117 @@ export class RsaSha512Mgf1 implements SignatureAlgorithm {
 }
 
 export class Ed25519 implements SignatureAlgorithm {
-    getSignature = createOptionalCallbackFunction(
-        (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
-            if (!(typeof privateKey === "string" || Buffer.isBuffer(privateKey))) {
-                throw new Error("keys must be strings or buffers");
-            }
-            // 使用 crypto.sign() 一次性签名 (Ed25519 不支持流式处理)
-            const signature = crypto.sign(null, <Uint8Array<ArrayBuffer> | Uint8ClampedArray<ArrayBuffer> | Uint16Array<ArrayBuffer> | Uint32Array<ArrayBuffer> | Int8Array<ArrayBuffer> | Int16Array<ArrayBuffer> | Int32Array<ArrayBuffer> | BigUint64Array<ArrayBuffer> | BigInt64Array<ArrayBuffer> | Float32Array<ArrayBuffer> | Float64Array<ArrayBuffer> | DataView<ArrayBufferLike>>signedInfo, privateKey);
-            return signature.toString('base64');
-        },
-    );
 
-    verifySignature = createOptionalCallbackFunction(
-        (material: string, key: crypto.KeyLike, signatureValue: string): boolean => {
-            if (!(typeof key === "string" || Buffer.isBuffer(key))) {
-                throw new Error("keys must be strings or buffers");
-            }
-            // 将 Base64 签名转换为 Buffer
-            const signature = Buffer.from(signatureValue, 'base64');
-            // 使用 crypto.verify() 验证签名
-            // @ts-ignore
-            return crypto.verify(null, material, key, signature);
-        },
-    );
+  // 保持参数类型为 crypto.BinaryLike 以匹配父类接口
+  getSignature = createOptionalCallbackFunction(
+    (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
+      if (!(typeof privateKey === "string" || Buffer.isBuffer(privateKey))) {
+        throw new Error("keys must be strings or buffers");
+      }
 
-    getAlgorithmName = () => {
-        return "http://www.w3.org/2007/05/xmldsig-more#eddsa-ed25519";
-    };
+      // Ed25519 需要二进制数据进行签名。
+      // 如果输入是字符串，必须转换为 Buffer。
+      const dataToSign = typeof signedInfo === 'string'
+        ? Buffer.from(signedInfo, 'utf8')
+        : signedInfo;
+
+      // crypto.sign 对于 Ed25519 第一个参数传 null
+      // 此时 dataToSign 保证是 ArrayBufferView 或 ArrayBuffer
+      const signature = crypto.sign(null, dataToSign, privateKey);
+
+      return signature.toString('base64');
+    },
+  );
+
+  // 保持参数类型为 string (根据报错信息，父类 verifySignature 的第一个参数可能是 string 或 BinaryLike)
+  // 查看报错信息：Type '{ (material: BinaryData... }' is not assignable to type '{ (material: string... }'
+  // 这说明你的基类 SignatureAlgorithm 定义 verifySignature 第一个参数是 string!
+  // 我们需要同时支持 string 和 BinaryLike 以确保兼容性，或者严格按照基类定义。
+  // 通常 XML 签名验证时，传入的是规范化后的 XML 字符串或 Buffer。
+  // 为了安全起见，我们接受 crypto.BinaryLike 并在内部处理，但为了通过 TS 检查，
+  // 我们必须让参数类型 >= 父类定义的類型。
+  // 如果父类定义是 string，我们就写 string | Buffer | ... 或者直接 BinaryLike
+
+  verifySignature = createOptionalCallbackFunction(
+    (material: crypto.BinaryLike, key: crypto.KeyLike, signatureValue: string): boolean => {
+      if (!(typeof key === "string" || Buffer.isBuffer(key))) {
+        throw new Error("keys must be strings or buffers");
+      }
+
+      // 将 Base64 签名转换为 Buffer
+      const signature = Buffer.from(signatureValue, 'base64');
+
+      // 同样，如果 material 是字符串，转换为 Buffer
+      const dataToVerify = typeof material === 'string'
+        ? Buffer.from(material, 'utf8')
+        : material;
+
+      // crypto.verify 对于 Ed25519 第一个参数传 null
+      return crypto.verify(null, dataToVerify, key, signature);
+    },
+  );
+
+  getAlgorithmName = () => {
+    return "http://www.w3.org/2007/05/xmldsig-more#eddsa-ed25519";
+  };
 }
 
-// 添加辅助函数将 BinaryLike 转换为 Buffer
-declare module "crypto" {
-    export function BinaryLikeToBuffer(data: crypto.BinaryLike): Buffer;
+export class Ed488 implements SignatureAlgorithm {
+
+  // 保持参数类型为 crypto.BinaryLike 以匹配父类接口
+  getSignature = createOptionalCallbackFunction(
+    (signedInfo: crypto.BinaryLike, privateKey: crypto.KeyLike): string => {
+      if (!(typeof privateKey === "string" || Buffer.isBuffer(privateKey))) {
+        throw new Error("keys must be strings or buffers");
+      }
+
+      // Ed25519 需要二进制数据进行签名。
+      // 如果输入是字符串，必须转换为 Buffer。
+      const dataToSign = typeof signedInfo === 'string'
+        ? Buffer.from(signedInfo, 'utf8')
+        : signedInfo;
+
+      // crypto.sign 对于 Ed25519 第一个参数传 null
+      // 此时 dataToSign 保证是 ArrayBufferView 或 ArrayBuffer
+      const signature = crypto.sign(null, dataToSign, privateKey);
+
+      return signature.toString('base64');
+    },
+  );
+
+  // 保持参数类型为 string (根据报错信息，父类 verifySignature 的第一个参数可能是 string 或 BinaryLike)
+  // 查看报错信息：Type '{ (material: BinaryData... }' is not assignable to type '{ (material: string... }'
+  // 这说明你的基类 SignatureAlgorithm 定义 verifySignature 第一个参数是 string!
+  // 我们需要同时支持 string 和 BinaryLike 以确保兼容性，或者严格按照基类定义。
+  // 通常 XML 签名验证时，传入的是规范化后的 XML 字符串或 Buffer。
+  // 为了安全起见，我们接受 crypto.BinaryLike 并在内部处理，但为了通过 TS 检查，
+  // 我们必须让参数类型 >= 父类定义的類型。
+  // 如果父类定义是 string，我们就写 string | Buffer | ... 或者直接 BinaryLike
+
+  verifySignature = createOptionalCallbackFunction(
+    (material: crypto.BinaryLike, key: crypto.KeyLike, signatureValue: string): boolean => {
+      if (!(typeof key === "string" || Buffer.isBuffer(key))) {
+        throw new Error("keys must be strings or buffers");
+      }
+
+      // 将 Base64 签名转换为 Buffer
+      const signature = Buffer.from(signatureValue, 'base64');
+
+      // 同样，如果 material 是字符串，转换为 Buffer
+      const dataToVerify = typeof material === 'string'
+        ? Buffer.from(material, 'utf8')
+        : material;
+
+      // crypto.verify 对于 Ed25519 第一个参数传 null
+      return crypto.verify(null, dataToVerify, key, signature);
+    },
+  );
+
+  getAlgorithmName = () => {
+    return "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448";
+  };
 }
+
 
 
 export class HmacSha1 implements SignatureAlgorithm {

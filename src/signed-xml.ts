@@ -124,6 +124,7 @@ export class SignedXml {
     "http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1": signatureAlgorithms.RsaSha512Mgf1,
     "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": signatureAlgorithms.RsaSha512,
     "http://www.w3.org/2007/05/xmldsig-more#eddsa-ed25519": signatureAlgorithms.Ed25519,
+    "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448": signatureAlgorithms.Ed488,
     // Disabled by default due to key confusion concerns.
     // 'http://www.w3.org/2000/09/xmldsig#hmac-sha1': SignatureAlgorithms.HmacSha1
   };
